@@ -1,0 +1,51 @@
+<% @page_title = @toolbar_title = "List Search Engines" %>
+<% content_for(:html_head) do %>
+  <% javascript_tag do %>
+    jQuery(function($){
+      $('table.data tbody tr').hover(function(){
+        $(this).addClass('hover')
+      }, function(){
+        $(this).removeClass('hover')
+      }).click(function(){
+        var match = this.id.match(/(.*)_(\d+)/) 
+        var type = match[1];
+        var id = match[2];
+        $('table.data tbody tr').removeClass('selected');
+        $(this).addClass('selected');
+        $('#edit_button').removeClass('disabled').attr('href', '/cms/search_engines/'+id+'/edit');
+        $('#delete_button').removeClass('disabled').attr('href', '/cms/search_engines/'+id)
+      })
+    })
+  <% end %>
+<% end %>
+<% content_for :functions do %>
+<%= link_to(span_tag("&nbsp;Add&nbsp;"), new_cms_search_engine_path, :class => "button") %>
+<%= link_to(span_tag("&nbsp;Edit&nbsp;"), '#', :id => 'edit_button', :class => "button disabled") %>
+<%= link_to span_tag("<span class=\"delete_img\">&nbsp;</span>Delete"), "#", :id => "delete_button", :class => "button disabled http_delete", :onclick => "return confirm('Are you sure you want to delete this search engine?')" %>
+<% end %>
+<div class="roundedcorners">
+<table class="data">
+  <thead>
+  <tr>
+    <th class="first"></th>
+    <th><div class="dividers">Name</div></th>
+    <th><div class="dividers">Enabled</div></th>
+    <th><div>Submitted At</div></th>
+    <th class="last"></th>
+  </tr>
+  </thead>
+  <% @search_engines.each do |search_engine| %>
+    <tr id="search_engine_<%= search_engine.id %>">
+      <td class="first"></td>
+      <td><div class="dividers"><%=h search_engine.name %></div></td>
+      <td><div class="dividers"><%= search_engine.enabled? ? 'Enabled' : '' %></div></td>
+      <td><div><%= search_engine.submitted_at && search_engine.submitted_at.to_s(:date) %></div></td>
+      <td class="last"></td>
+    </tr>
+  <% end %>
+</table>
+<div class="tl"></div>
+<div class="tr"></div>
+<div class="bl"></div>
+<div class="br"></div>
+</div>

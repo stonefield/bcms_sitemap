@@ -1,0 +1,17 @@
+<%= content_for :html_head, stylesheet_link_tag('cms/form_layout') %>
+<% form_for([:cms, @search_engine]) do |f| %>
+  <%= f.error_messages %>
+  <%= f.cms_text_field :name %>
+  <div class="fields checkbox_group">
+    <%= f.label :enabled, 'Enabled?' %>
+    <%= f.check_box :enabled %>
+  </div>
+  <%= f.cms_text_field :url, :label => 'Submission url', 
+    :instructions => 'This should be the complete submission url, ending with "=". The local sitemap url will be added to the end of this url' %>
+  <%= f.cms_text_field :verification_file, 
+    :instructions => 'Input filename. The system assumes that the file should reside in the public folder. Upon save, the file will be stored in that location with thw content defined below.' %>
+  <%= f.cms_text_area :verification_content, :label => "Verification file content" %>
+  <div class="buttons">
+    <%= lt_button_wrapper(f.submit("Save", :class => "submit")) %>
+  </div>
+<% end %>
