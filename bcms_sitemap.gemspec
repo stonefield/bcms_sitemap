@@ -35,6 +35,7 @@ Gem::Specification.new do |s|
      "lib/bcms_sitemap.rb",
      "lib/bcms_sitemap/routes.rb",
      "lib/bcms_sitemap/sitemap_submitter.rb",
+     "lib/tasks/bcms_sitemap.rake",
      "lib/tasks/sitemap.rake",
      "rails/init.rb"
   ]
