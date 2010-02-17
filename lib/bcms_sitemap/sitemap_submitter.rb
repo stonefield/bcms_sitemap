@@ -101,7 +101,7 @@ class Cms::SitemapSubmitter
   end
   
   def parameters #:nodoc:
-    CGI.escape "#{sitemaps_url(:host => SITE_DOMAIN)}.xml"
+    CGI.escape "#{sitemaps_url(:host => SITE_DOMAIN)}"
   end
   
   def logger #:nodoc:

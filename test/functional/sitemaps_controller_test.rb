@@ -3,9 +3,9 @@ require 'test_helper'
 class SitemapsControllerTest < ActionController::TestCase  
   # Replace this with your real tests.
   
-  should_route :get, '/sitemaps', :controller => :sitemaps, :action => :index
-  should_route :get, '/sitemaps/pages', :controller => :sitemaps, :action => 'model', :model => 'pages'
-  should_route :get, '/sitemaps/news_articles', :controller => :sitemaps, :action => 'model', :model => 'news_articles'
+  should_route :get, '/sitemaps.xml', :controller => :sitemaps, :action => :index
+  should_route :get, '/sitemaps/pages.xml', :controller => :sitemaps, :action => 'model', :model => 'pages'
+  should_route :get, '/sitemaps/news_articles.xml', :controller => :sitemaps, :action => 'model', :model => 'news_articles'
   
   XML_UTF8 = 'application/xml; charset=utf-8'
   
@@ -69,7 +69,7 @@ TEXT
         setup do
           @page = create_page 
           @news = create_news_article
-          get :index, :format => 'xml'
+          get :index
         end
         should 'return correct structure and content' do
           assert_dom_equal EXPECTED_SITEMAP, @response.body
