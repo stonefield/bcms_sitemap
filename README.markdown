@@ -31,10 +31,6 @@ Edit the config/environment.rb file and add the following after config.gem 'brow
 
     config.gem 'bcms_sitemap'
 
-Edit routes.rb file - add the following *before* map.routes\_for\_browser\_cms:
-
-    map.routes_for_bcms_sitemap
-  
 **Install the new module**
 
 From the root directory of your app, run the following:
@@ -44,6 +40,10 @@ From the root directory of your app, run the following:
 This will add the necessary files to you application. In particular, you may want to change the settings in
 the file config/initializers/bcms\_sitemap.rb. (See also customization below)
 
+Edit routes.rb file - add the following *before* map.routes\_for\_browser\_cms:
+
+    map.routes_for_bcms_sitemap
+  
 **Run the migrations**
 
     $ rake db:migrate
