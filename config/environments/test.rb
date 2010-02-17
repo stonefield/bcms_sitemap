@@ -31,3 +31,4 @@ SITE_DOMAIN="localhost:3000"
 config.gem 'thoughtbot-shoulda', :lib => 'shoulda'
 
 APP_CONFIG = {:use_x_sendfile => false }
+require File.join(File.dirname(__FILE__), "..", "..", "lib", "bcms_sitemap")

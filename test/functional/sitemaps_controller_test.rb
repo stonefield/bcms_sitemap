@@ -4,8 +4,8 @@ class SitemapsControllerTest < ActionController::TestCase
   # Replace this with your real tests.
   
   should_route :get, '/sitemaps', :controller => :sitemaps, :action => :index
-  should_route :get, '/sitemaps/pages', :controller => :sitemaps, :action => :pages
-  should_route :get, '/sitemaps/news_articles', :controller => :sitemaps, :action => :news_articles
+  should_route :get, '/sitemaps/pages', :controller => :sitemaps, :action => 'model', :model => 'pages'
+  should_route :get, '/sitemaps/news_articles', :controller => :sitemaps, :action => 'model', :model => 'news_articles'
   
   XML_UTF8 = 'application/xml; charset=utf-8'
   
@@ -13,11 +13,11 @@ EXPECTED_SITEMAP = <<-TEXT
 <?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
-    <loc>http://localhost:3000/sitemaps/pages.xml</loc>
+    <loc>http://test.host/sitemaps/news_articles.xml</loc>
     <lastmod>2010-02-05T10:54:49Z</lastmod>
   </sitemap>
   <sitemap>
-    <loc>http://localhost:3000/sitemaps/news_articles.xml</loc>
+    <loc>http://test.host/sitemaps/pages.xml</loc>
     <lastmod>2010-02-05T10:54:49Z</lastmod>
   </sitemap>
 </sitemapindex>
@@ -79,7 +79,7 @@ TEXT
     
     context 'pages' do
       setup do
-        get :pages, :format => 'xml'
+        get :model, :model => 'pages', :format => :xml
       end
       should 'generate map', :before => lambda { page('/')} do
         assert_dom_equal @expected, @response.body

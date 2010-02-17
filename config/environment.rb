@@ -40,5 +40,4 @@ Rails::Initializer.run do |config|
   # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
   # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}')]
   # config.i18n.default_locale = :de
-  SITE_COPYRIGHT = "2010#{Date.today.year > 2010 ? '-' << Date.today.year.to_s : ''} Dynamic Project Management AS"
 end

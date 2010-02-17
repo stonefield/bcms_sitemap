@@ -2,6 +2,21 @@ require 'test_helper'
 
 class Cms::SitemapSubmitterTest < ActiveSupport::TestCase
   
+  context 'backporting models' do
+    should 'be initialized' do
+      assert Cms::SitemapSubmitter.models.is_a? Array
+      assert Cms::SitemapSubmitter.models.include? 'pages'
+      assert Cms::SitemapSubmitter.models.include? 'news_articles'
+    end
+    should 'just happen' do
+      assert Page.respond_to? :bcms_sitemap_scope
+      Cms::SitemapSubmitter.models.each do |model|
+        assert model.classify.constantize.respond_to? :bcms_sitemap_scope
+        assert model.classify.constantize.respond_to? :bcms_sitemap_last_update
+      end
+    end
+  end
+  
   context 'submitting sitemap' do
     setup do
       @search_engine = create_search_engine

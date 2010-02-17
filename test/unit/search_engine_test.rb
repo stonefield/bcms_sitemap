@@ -68,13 +68,16 @@ class SearchEngineTest < ActiveSupport::TestCase
       @search_engine = new_search_engine(
         :verification_file => @filename,
         :verification_content => @filecontent)
-      @search_engine.stubs(:signatory_folder).returns(TEST_FILES_FOLDER)
+      SearchEngine.stubs(:signatory_folder).returns(TEST_FILES_FOLDER)
       @search_engine.save
+      @expected_file = "#{TEST_FILES_FOLDER}/#{@filename}"
     end
     teardown do
       teardown_test_folder
     end
-    
+    should 'know it it has a signatory file' do
+      assert @search_engine.has_signatory_file?
+    end
     should 'create file and fill content' do
       expected_file = "#{TEST_FILES_FOLDER}/#{@filename}"
       assert File.exist?(expected_file), "File was not created upon creation"
@@ -83,10 +86,9 @@ class SearchEngineTest < ActiveSupport::TestCase
       file.close
     end
     should 'remove file upon destruction' do
-      expected_file = "#{TEST_FILES_FOLDER}/#{@filename}"
-      assert File.exist?(expected_file)
+      assert File.exist?(@expected_file)
       @search_engine.destroy
-      assert !File.exist?(expected_file)
+      assert !File.exist?(@expected_file)
     end
     context 'being modified' do
       setup do
@@ -100,12 +102,22 @@ class SearchEngineTest < ActiveSupport::TestCase
         assert File.exist?("#{TEST_FILES_FOLDER}/#{@new_filename}")
       end
       should 'change content if changed' do
-        expected_file = "#{TEST_FILES_FOLDER}/#{@filename}"
         @search_engine.verification_content = @new_content
         @search_engine.save
-        file = File.new(expected_file)
+        file = File.new(@expected_file)
         assert_equal @new_content, file.read
         file.close
+      end
+    end
+    context 'verification' do
+      setup do
+        flunk unless File.exist?(@expected_file)
+        File.delete(@expected_file)
+        flunk if File.exist?(@expected_file)
+        SearchEngine.verify_signatories!
+      end
+      should 'create signatory files' do
+        assert File.exist?(@expected_file)
       end
     end
     

@@ -7,9 +7,21 @@ class SearchEngine < ActiveRecord::Base
   after_destroy :remove_signatory_file
   
   named_scope :enabled, :conditions => ['enabled = ?', true]
-  
-  def self.last_submit
-    minimum(:submitted_at)
+
+  class << self
+    def last_submit
+      minimum(:submitted_at)
+    end
+    
+    def verify_signatories!
+      all.each do |search_engine|
+        search_engine.send(:create_signatory_file) unless search_engine.has_signatory_file?
+      end
+    end
+    
+    def signatory_folder
+      File.join(Rails.root, 'public')
+    end
   end
     
   def submit
@@ -19,11 +31,15 @@ class SearchEngine < ActiveRecord::Base
   end
   
   def signatory_folder
-     File.join(Rails.root, 'public')
+    self.class.signatory_folder
   end
   
   def signatory_file_name
-    verification_file && File.join(signatory_folder, verification_file )
+    verification_file && !verification_file.empty? && File.join(signatory_folder, verification_file )
+  end
+  
+  def has_signatory_file?
+    signatory_file_name && File.exists?(signatory_file_name)
   end
   
 protected
@@ -33,10 +49,14 @@ protected
         # new file_name - just remove the old one 
         File.delete File.join(signatory_folder, verification_file_was )
       end
-      unless verification_file.empty?
-        File.atomic_write(signatory_file_name) do |file|
-          file.write(verification_content || '')
-        end
+      create_signatory_file
+    end
+  end
+  
+  def create_signatory_file
+    if verification_file
+      File.atomic_write(signatory_file_name) do |file|
+        file.write(verification_content || '')
       end
     end
   end

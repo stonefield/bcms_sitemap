@@ -1,23 +1,22 @@
 class SitemapsController < ApplicationController
-  caches_page :index, :pages, :news_articles
+  caches_page :index, :model
   
   def index
     @entries = {}
-    %w(page news_article).each do |model|
-      item = model.classify.constantize.published.first(:order => 'updated_at DESC')
-      @entries[model.pluralize] = item if item 
-    end
-    respond_to do |format|
-      format.xml
+    Cms::SitemapSubmitter.models.each do |model|
+      last_update = model.classify.constantize.bcms_sitemap_last_update
+      @entries[model.pluralize] = last_update if last_update
     end
   end
   
-  def pages
-    @pages = Page.published.not_hidden.all
-  end
-  
-  def news_articles
-    @articles = NewsArticle.released.all
-  end
-
+  def model
+    model = params[:model]
+    @objects = model.classify.constantize.bcms_sitemap_scope
+    instance_variable_set("@#{model}", @objects) # Template usually wants @pages, @news_articles etc
+    if Rails.root.join('app','views','sitemaps',"#{model}.builder").exist?
+      render "#{model}.builder"
+    else
+      render 'model.builder'
+    end
+  end  
 end

@@ -4,19 +4,27 @@ class Cms::SitemapSubmitter
   include ActionController::Caching::Pages
   
   class << self
+    
     # Checks to see if there has been any updates since last time.
     # If so, clears the cache for the relevant model and submits the url to the search engine's that have not yet been notified
     def run
       submit_time = SearchEngine.enabled.minimum(:submitted_at)
-      last_update_news = NewsArticle.released.maximum(:updated_at)
-      last_update_pages = Page.published.not_hidden.maximum(:updated_at)
-      last_update = [ last_update_news, last_update_pages].compact.max
       
+      # collect timestamp for all models. We don't want to expire more pages than necessary
+      timestamps = {}
+      @models.each do |model|
+        last_update = model.classify.constantize.bcms_sitemap_last_update
+        timestamps[model] = last_update if last_update
+      end
+      last_update = timestamps.values.compact.max
+      # try this {}.values.compact.max
       if last_update && (submit_time.nil? || submit_time < last_update)
         # This is a lazy cleaning of cache
         expire_page :controller => 'sitemaps', :action => 'index', :format => 'xml'
-        expire_page :controller => 'sitemaps', :action => 'news_articles', :format => 'xml' if last_update_news && submit_time < last_update_news
-        expire_page :controller => 'sitemaps', :action => 'pages', :format => 'xml' if last_update_pages && submit_time < last_update_pages
+
+        @models.each do |model|
+          expire_page :controller => 'sitemaps', :model => model, :format => 'xml' if !timestamps[model] || submit_time < timestamps[model]
+        end
         SearchEngine.enabled.all.each do |search_engine|
           if search_engine.submitted_at.nil? || search_engine.submitted_at < last_update
             search_engine.submit
@@ -25,25 +33,58 @@ class Cms::SitemapSubmitter
       end
     end
 
-    # Submit a single search enging. Called from run through the search engine
+    # Submit a single search engine. Called from run through the search engine
     def submit(search_engine)
       sumbmitter = new(search_engine)
       sumbmitter.submit
     end
+
+    # State what models to publish as a hash. 
+    # The keys are the plural names of the models.
+    # The values should be the scope to be used, formed as string
+    #    Cms::SitemapSubmitter.publish_models = {:pages => 'published.not_hidden', :news_articles => 'released' }
+    def publish_models=(models)
+      models.each_pair do |model, scope|
+        logger.debug "Backporting #{model} with bcms_sitemap accessors for selecting data - scope defined: '#{scope}'"
+        src = <<-end_src
+          class << self
+            def bcms_sitemap_scope
+              #{scope}.all
+            end
+            def bcms_sitemap_last_update
+              #{scope}.maximum(:updated_at)
+            end
+          end
+        end_src
+        model.to_s.classify.constantize.class_eval src, __FILE__, __LINE__
+      end
+      @models = models.keys.collect { |k| k.to_s  }.sort
+    end
     
-    def perform_caching
+    # the models defined by the application that will have sitemap information
+    def models
+      @models
+    end
+    
+    def logger #:nodoc:
+      RAILS_DEFAULT_LOGGER
+    end
+    
+    def perform_caching #:nodoc:
       ApplicationController.perform_caching
     end    
   end
   
   
   attr_accessor :search_engine, :connection
-  def initialize(search_engine)
+  
+  
+  def initialize(search_engine) #:nodoc:
     @search_engine = search_engine
     @connection = ActiveResource::Connection.new(search_engine.url)
   end
   
-  def submit
+  def submit #:nodoc:
     response = 200
     begin
       @connection.get(document_url)
@@ -55,14 +96,15 @@ class Cms::SitemapSubmitter
     response
   end
   
-  def document_url
+  def document_url #:nodoc:
     @document_url ||= "#{search_engine.url}#{parameters}"
   end
   
-  def parameters
-    CGI.escape sitemaps_url(:host => SITE_DOMAIN, :format => :xml)
+  def parameters #:nodoc:
+    CGI.escape "#{sitemaps_url(:host => SITE_DOMAIN)}.xml"
   end
-  def logger
-    RAILS_DEFAULT_LOGGER
+  
+  def logger #:nodoc:
+    self.class.logger
   end
 end
