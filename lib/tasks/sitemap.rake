@@ -19,7 +19,7 @@ namespace :sitemap do
     If they are not there, they will be created.
     You want to run this as the last part of your deployment. If using capistrano you may add this to your deploy.rb file
     
-    namespace :sitemap do
+    namespace :sitemap, :roles => :app do
       task :verify_signatories do
         rake = fetch(:rake, "rake")
         rails_env = fetch(:rails_env, "production")
