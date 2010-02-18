@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Knut Stenmark"]
   s.date = %q{2010-02-17}
-  s.description = %q{Sitemap submitter module for BrowserCMS, which enables submission of sitemap to different search engines}
+  s.description = %q{Warning. Not tested in production environment yet. Sitemap submitter module for BrowserCMS, which enables submission of sitemap to different search engines}
   s.email = %q{knut.stenmark@gmail.com}
   s.extra_rdoc_files = [
     "LICENSE.txt",
