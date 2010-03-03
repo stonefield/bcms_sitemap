@@ -1,0 +1,5 @@
+
+new_article:
+  name: News Article
+  pattern: /news/articles/:year/:month/:day/:slug
+  code: 

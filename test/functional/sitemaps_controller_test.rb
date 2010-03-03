@@ -34,7 +34,7 @@ def page(path, priority = 0.9, frequency = :daily, archived = false)
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>http://localhost:3000#{path}</loc>
+    <loc>http://test.host#{path}</loc>
     <lastmod>2010-02-05T10:54:49Z</lastmod>
     <changefreq>#{frequency}</changefreq>
     <priority>#{priority}</priority>
@@ -115,23 +115,39 @@ TEXT
       setup do
         @article = create_news_article(:name => 'This is the name of the article', :release_date => @time.to_date)
       end
-      should_eventually 'publish articles' do
+      should 'publish articles' do
         @expected = <<-TEXT
-        <?xml version="1.0" encoding="UTF-8"?>
-        <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-          <url>
-            <loc>http://localhost:3000/news/articles/2010/02/10/this-is-the-name-of-the-article</loc>
-            <lastmod>2010-02-05T10:54:49Z</lastmod>
-            <changefreq>weekly</changefreq>
-            <priority>0.7</priority>
-          </url>
-        </urlset>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://test.host/news/articles/2010/02/04/this-is-the-name-of-the-article</loc>
+    <lastmod>2010-02-05T10:54:49Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>
         TEXT
-        get :news_articles, :format => 'xml'
+        get :model, :model => 'news_articles', :format => :xml
         assert_response :success
         assert_dom_equal @expected, @response.body
       end
       should_eventually 'give archived articles lower priority' do
+        @article.update_attribute(:archived, true)
+        @expected = <<-TEXT
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://test.host/news/articles/2010/02/04/this-is-the-name-of-the-article</loc>
+    <lastmod>2010-02-05T10:54:49Z</lastmod>
+    <changefreq>never</changefreq>
+    <priority>0.4</priority>
+  </url>
+</urlset>
+        TEXT
+        get :model, :model => 'news_articles', :format => :xml
+        assert_response :success
+        assert_dom_equal @expected, @response.body
+        
       end
     end
     

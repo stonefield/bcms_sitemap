@@ -4,7 +4,13 @@ module SitemapsHelper
   end
   
   def xml_url(object)
-    "http://#{SITE_DOMAIN}#{object.path}"
+    if object.respond_to? :path
+      "http://#{SITE_DOMAIN}#{object.path}"
+    elsif object.respond_to? :route_params
+      polymorphic_url(object, object.route_params)
+    else
+      polymorphic_url(object)
+    end
   end
   
   def xml_article_url(object)

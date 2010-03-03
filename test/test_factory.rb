@@ -26,4 +26,7 @@ module TestFactory
   def create_news_article(options = {})
     _create NewsArticle.create({:name => 'Nyhet', :body => 'i dag', :published => true, :release_date => Date.today}.merge(options))
   end  
+  def new_news_article(options = {})
+    NewsArticle.new({:name => 'Nyhet', :body => 'i dag', :published => true, :release_date => Date.today}.merge(options))
+  end  
 end

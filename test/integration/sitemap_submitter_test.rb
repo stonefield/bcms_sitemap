@@ -33,7 +33,7 @@ class Cms::SitemapSubmitterTest < ActiveSupport::TestCase
       assert_equal 404, resp
     end
     should 'generate correct parameters' do
-      assert_equal "http%3A%2F%2Flocalhost%3A3000%2Fsitemaps.xml", @submitter.parameters
+      assert_equal "http%3A%2F%2Ftest.host%2Fsitemaps.xml", @submitter.parameters
     end
   end
   
