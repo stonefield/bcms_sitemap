@@ -7,7 +7,8 @@ module SitemapsHelper
     if object.respond_to? :path
       "http://#{SITE_DOMAIN}#{object.path}"
     elsif object.respond_to? :route_params
-      polymorphic_url(object, object.route_params)
+      object_name = ActionController::RecordIdentifier::singular_class_name(object)
+      self.send("#{object_name}_url", object.route_params) 
     else
       polymorphic_url(object)
     end
