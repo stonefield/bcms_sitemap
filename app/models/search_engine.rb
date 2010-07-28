@@ -35,7 +35,7 @@ class SearchEngine < ActiveRecord::Base
   end
   
   def signatory_file_name
-    verification_file && !verification_file.empty? && File.join(signatory_folder, verification_file )
+    verification_file && !verification_file.blank? && File.join(signatory_folder, verification_file )
   end
   
   def has_signatory_file?
@@ -54,7 +54,7 @@ protected
   end
   
   def create_signatory_file
-    if verification_file
+    unless verification_file.blank?
       File.atomic_write(signatory_file_name) do |file|
         file.write(verification_content || '')
       end
