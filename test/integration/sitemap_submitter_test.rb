@@ -23,17 +23,34 @@ class Cms::SitemapSubmitterTest < ActiveSupport::TestCase
       @submitter = Cms::SitemapSubmitter.new(@search_engine)
     end
     should 'return response code on success' do
-      @submitter.instance_variable_get(:@connection).stubs(:get).returns('')
+      @submitter.stubs(:get).returns(Net::HTTPSuccess.new('1.1', 200, 'OK'))
       resp = @submitter.submit
       assert_equal 200, resp
     end
     should 'return response code on failure' do
-      @submitter.instance_variable_get(:@connection).expects(:get).raises(ActiveResource::ResourceNotFound, 404)
+      @submitter.stubs(:get).returns(Net::HTTPNotFound.new('1.1', 404, 'NotFound'))
       resp = @submitter.submit
       assert_equal 404, resp
     end
     should 'generate correct parameters' do
       assert_equal "http%3A%2F%2Ftest.host%2Fsitemaps.xml", @submitter.parameters
+    end
+  end
+  
+  context 'expiring cache for sitemap' do
+    should 'execute' do
+      ApplicationController.perform_caching = true
+      assert_nil Cms::SitemapSubmitter.expire_sitemap( :controller => 'sitemaps', :action => 'test', :format => 'xml')
+      ApplicationController.perform_caching = false
+    end
+  end
+  
+  context 'calculating path' do
+    should 'exclude index from path' do
+      assert_equal '/sitemaps.xml', Cms::SitemapSubmitter.sitemap_path(:controller => 'sitemaps', :action => 'index', :format => 'xml')
+    end
+    should 'include odel in path' do
+      assert_equal '/sitemaps/test.xml', Cms::SitemapSubmitter.sitemap_path(:controller => 'sitemaps', :action => 'test', :format => 'xml')
     end
   end
   

@@ -1,14 +1,14 @@
 require 'cgi'
+require 'net/https'
 class Cms::SitemapSubmitter
   include ActionController::UrlWriter
-  include ActionController::Caching::Pages
   
   class << self
     
     # Checks to see if there has been any updates since last time.
     # If so, clears the cache for the relevant model and submits the url to the search engine's that have not yet been notified
     def run
-      submit_time = SearchEngine.enabled.minimum(:submitted_at)
+      submit_time = SearchEngine.enabled.minimum(:submitted_at) || Time.now.years_ago(10)
       
       # collect timestamp for all models. We don't want to expire more pages than necessary
       timestamps = {}
@@ -18,18 +18,31 @@ class Cms::SitemapSubmitter
       end
       last_update = timestamps.values.compact.max
       # try this {}.values.compact.max
-      if last_update && (submit_time.nil? || submit_time < last_update)
+      if last_update && (submit_time.nil? || (submit_time < last_update))
         # This is a lazy cleaning of cache
-        expire_page :controller => 'sitemaps', :action => 'index', :format => 'xml'
+        expire_sitemap :controller => 'sitemaps', :action => 'index', :format => 'xml'
 
         @models.each do |model|
-          expire_page :controller => 'sitemaps', :model => model, :format => 'xml' if !timestamps[model] || submit_time < timestamps[model]
+          expire_sitemap :controller => 'sitemaps', :action => model, :format => 'xml' if !timestamps[model] || submit_time < timestamps[model]
         end
         SearchEngine.enabled.all.each do |search_engine|
           if search_engine.submitted_at.nil? || search_engine.submitted_at < last_update
             search_engine.submit
           end
         end
+      end
+    end
+    
+    def expire_sitemap(options = {})
+      return unless perform_caching
+      ApplicationController::expire_page sitemap_path(options)
+    end
+    
+    def sitemap_path(options = {})
+      if options[:action] == 'index'
+        "/#{options[:controller]}.#{options[:format]}"
+      else
+        "/#{options[:controller]}/#{options[:action]}.#{options[:format]}"
       end
     end
 
@@ -81,19 +94,25 @@ class Cms::SitemapSubmitter
   
   def initialize(search_engine) #:nodoc:
     @search_engine = search_engine
-    @connection = ActiveResource::Connection.new(search_engine.url)
   end
   
   def submit #:nodoc:
-    response = 200
-    begin
-      @connection.get(document_url)
+    puts "Submitting #{document_url}"
+    resp = get document_url
+    puts "Response was #{resp.code} #{resp.message}"
+    puts "Body #{resp.body}"
+    if resp.is_a? Net::HTTPOK
       logger.info "Sitemap was successfully submitted to #{search_engine.name} (#{document_url})"
-    rescue => e
-      logger.error "Sitemap submition failed for #{search_engine.name} (#{document_url})\nResponse was #{e.response}"
-      response = e.response
+    else
+      logger.error "Sitemap submition failed for #{search_engine.name} (#{document_url})\nResponse was #{resp.code} #{resp.message}"
     end
-    response
+    resp.code
+  end
+  
+  def get(document_url)
+    url = URI.parse(document_url)
+    http = Net::HTTP.new(url.host, url.port)
+    resp = http.send_request('GET', url.request_uri)
   end
   
   def document_url #:nodoc:
