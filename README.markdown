@@ -77,14 +77,16 @@ and automatically create these upon saving the record for the individual search 
 
 For more information see the individual sites:
 
-[Ask](http://about.ask.com/en/docs/about/webmasters.shtml),
 [Google](http://www.google.com/support/webmasters/bin/answer.py?hl=en&answer=156184),
 [Yahoo](http://help.yahoo.com/l/us/yahoo/smallbusiness/store/promote/sitemap/sitemap-16.html) and 
 [yahoo submissions](https://siteexplorer.search.yahoo.com/submit), [Live/Bing](http://www.bing.com/webmaster)
 
-[Moreover](http://moreover.com) does not require authentication. (Not really a search engine, but provides news many to companies)
+[Ask](http://about.ask.com/en/docs/about/webmasters.shtml) and
+[Moreover](http://moreover.com) does not require authentication. (Moreover is not really a search engine, but provides news many to companies)
   
 [See also](http://www.hariesdesign.com/tips-and-trick/6-seo/46-submit-a-sitemap-to-top-5-search-engine) http://www.hariesdesign.com/tips-and-trick/6-seo/46-submit-a-sitemap-to-top-5-search-engine
+
+Yahoo must be manually submitted the first time.
   
 ### Setting up your submission job
 You can use either cron or backgroundrb to submit your sitemap. My preference is cron.
@@ -165,3 +167,7 @@ If you deploy using capistrano, you may want to add the sitemap:verify_signatori
 
 Currently the module is placing a template for rendering the search engines in the administration interface, due to inflexible module
 facilities in BrowserCMS. (Should be on the backlog for the browser cms team). Meanwhile, that view has to be stored locally.
+
+# Issues
+
+I have had some issues with submitting updates to yahoo. This is currently under investigation.
