@@ -15,7 +15,7 @@ class CreateSearchEngines < ActiveRecord::Migration
     SearchEngine.create :name => 'Yahoo', :url => 'http://search.yahooapis.com/SiteExplorerService/V1/ping?sitemap='
     SearchEngine.create :name => 'Ask', :url => 'http://submissions.ask.com/ping?sitemap='
     SearchEngine.create :name => 'Live/Bing', :url => 'http://www.bing.com/webmaster/ping.aspx?siteMap='
-    SearchEngine.create :name => 'Moreover', :url => 'http://api.moreover.com/ping?u='
+    SearchEngine.create :name => 'Moreover', :url => 'http://rpc.weblogs.com/pingSiteForm?url='
   end
 
   def self.down
