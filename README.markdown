@@ -1,6 +1,4 @@
-**WARNING: This module has not yet been tested in a live production environment** 
-
-Available as a gem at [Gemcutter.org](http://gemcutter.org)
+Available as a gem at [RubyGems.org](http://rubygems.org)
 
 # BCMS\_sitemap BrowserCMS sitemap submission module
 
