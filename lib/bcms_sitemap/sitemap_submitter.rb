@@ -97,10 +97,10 @@ class Cms::SitemapSubmitter
   end
   
   def submit #:nodoc:
-    puts "Submitting #{document_url}"
+    #puts "Submitting #{document_url}"
     resp = get document_url
-    puts "Response was #{resp.code} #{resp.message}"
-    puts "Body #{resp.body}"
+    #puts "Response was #{resp.code} #{resp.message}"
+    #puts "Body #{resp.body}"
     if resp.is_a? Net::HTTPOK
       logger.info "Sitemap was successfully submitted to #{search_engine.name} (#{document_url})"
     else
