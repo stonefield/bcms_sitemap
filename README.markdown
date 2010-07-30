@@ -152,8 +152,8 @@ There are three rake tasks:
 
 If you deploy using capistrano, you may want to add the sitemap:verify_signatories task deployment.rb
 
-    namespace :sitemap, :roles => :app do
-      task :verify_signatories do
+    namespace :sitemap do
+      task :verify_signatories, :roles => :app do
         rake = fetch(:rake, "rake")
         rails_env = fetch(:rails_env, "production")
         run "cd \#{current_path}; \#{rake} RAILS_ENV=\#{rails_env} sitemap:verify_signatories"
