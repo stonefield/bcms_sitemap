@@ -14,7 +14,7 @@ begin
   Jeweler::Tasks.new do |gemspec|
     gemspec.name = "bcms_sitemap"
     gemspec.summary = "Sitemap submitter module for BrowserCMS"
-    gemspec.description = "Warning. Not tested in production environment yet. Sitemap submitter module for BrowserCMS, which enables submission of sitemap to different search engines"
+    gemspec.description = "Sitemap submitter module for BrowserCMS, which enables submission of sitemap to different search engines"
     gemspec.email = "knut.stenmark@gmail.com"
     gemspec.homepage = "http://github.com/stonefield/bcms_sitemap"
     gemspec.authors = ["Knut Stenmark"]
