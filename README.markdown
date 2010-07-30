@@ -99,11 +99,12 @@ Add the following:
     #!/usr/bin/env ruby
     require 'fileutils'
     
+    LUSER="...the user running the app..."
     APP_ROOT="/...yoursite..."
     RAILS_ENV="production"
     RAKE_OPTS='-q -s'
     Dir.chdir "#{APP_ROOT}/current"
-    `RAILS_ENV=#{RAILS_ENV} rake #{RAKE_OPTS} sitemap:submit`
+    `su #{LUSER} -c "RAILS_ENV=#{RAILS_ENV} rake #{RAKE_OPTS} sitemap:submit"`    
 
 Make it executable:
 
